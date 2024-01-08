@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerController.h"
 #include "CustomController.generated.h"
 
+class ACustomCharacter;
+class UGravityGunController;
+
 /**
  *
  */
@@ -13,6 +16,10 @@ UCLASS()
 class UE5_INTRODUCTION_API ACustomController : public APlayerController
 {
 	GENERATED_BODY()
+
+protected:
+	virtual void BeginPlay() override;
+	virtual void LateBeginPlay();
 
 
 protected:
@@ -52,5 +59,6 @@ public:
 	void AddYawInput(float value) override;
 
 protected:
-	class ACustomCharacter* character{ nullptr };
+	ACustomCharacter* character{ nullptr };
+	UGravityGunController* gravityGunController{ nullptr };
 };

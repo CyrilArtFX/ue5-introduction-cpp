@@ -3,13 +3,30 @@
 
 #include "Controller/CustomController.h"
 #include "Character/CustomCharacter.h"
+#include "GravityGun/GravityGunController.h"
 #include "Defines.h"
+
+
+void ACustomController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	GetWorld()->OnWorldBeginPlay.AddUObject(this, &ACustomController::LateBeginPlay);
+}
+
+void ACustomController::LateBeginPlay()
+{
+	gravityGunController = GetComponentByClass<UGravityGunController>();
+
+	if (IsValid(gravityGunController))
+	{
+		gravityGunController->SetupInputs(character, InputComponent);
+	}
+}
 
 
 void ACustomController::MoveForward(float value)
 {
-	kPRINT_TICK("MoveForward : " + FString::SanitizeFloat(value));
-
 	if (!IsValid(character)) return;
 	if (value == 0.0f) return;
 
@@ -18,8 +35,6 @@ void ACustomController::MoveForward(float value)
 
 void ACustomController::MoveRight(float value)
 {
-	kPRINT_TICK("MoveRight : " + FString::SanitizeFloat(value));
-
 	if (!IsValid(character)) return;
 	if (value == 0.0f) return;
 
@@ -28,8 +43,6 @@ void ACustomController::MoveRight(float value)
 
 void ACustomController::Jump()
 {
-	kPRINT("Jump");
-
 	if (!IsValid(character)) return;
 
 	character->Jump();
