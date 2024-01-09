@@ -25,7 +25,18 @@ void UGravityGunController::SetupInputs(ACustomCharacter* character_, TObjectPtr
 	}
 
 	inputComponent->BindAction(TakeInputName, EInputEvent::IE_Pressed, this, &UGravityGunController::TakeObjectPressed);
-	inputComponent->BindAction(ThrowInputName, EInputEvent::IE_Pressed, this, &UGravityGunController::ThrowObjectPressed);
+
+	if (IsValid(gravityGun) && gravityGun->UseComplexThrowForce())
+	{
+		inputComponent->BindAction(ThrowInputName, EInputEvent::IE_Pressed, this, &UGravityGunController::ComplexThrowForce);
+		inputComponent->BindAction(ThrowInputName, EInputEvent::IE_Released, this, &UGravityGunController::ThrowObjectPressed);
+	}
+	else
+	{
+		inputComponent->BindAction(ThrowInputName, EInputEvent::IE_Pressed, this, &UGravityGunController::ThrowObjectPressed);
+	}
+
+	inputComponent->BindAxis(RangeInputName, this, &UGravityGunController::RangeChange);
 }
 
 void UGravityGunController::TakeObjectPressed()
@@ -35,9 +46,24 @@ void UGravityGunController::TakeObjectPressed()
 	gravityGun->TakeObject();
 }
 
+void UGravityGunController::ComplexThrowForce()
+{
+	if (!IsValid(gravityGun)) return;
+
+	gravityGun->ComplexThrowForceAccumulation();
+}
+
 void UGravityGunController::ThrowObjectPressed()
 {
 	if (!IsValid(gravityGun)) return;
 
 	gravityGun->ThrowObject();
+}
+
+void UGravityGunController::RangeChange(float value)
+{
+	if (!IsValid(gravityGun)) return;
+	if (value == 0.0f) return;
+
+	gravityGun->UpdateRange(value * RangeChangeSensitivity);
 }

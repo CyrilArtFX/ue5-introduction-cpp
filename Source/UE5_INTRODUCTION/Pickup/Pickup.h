@@ -1,26 +1,64 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Pickup.generated.h"
 
+
+UENUM()
+enum class EPickupType : uint8
+{
+	Standard,
+	DestroyAfterThrow,
+	DestroyAfterTake,
+
+	MAX			UMETA(Hidden)
+};
+
+
+USTRUCT(BlueprintType)
+struct FPickupStruct
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EPickupType PickupType{ EPickupType::Standard };
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ClampMin = 0.0f, ClampMax = 30.0f, EditCondition = "PickupType == EPickupType::DestroyAfterThrow || PickupType == EPickupType::DestroyAfterTake", EditConditionHides))
+	float DestructionTimer{ 5.0f };
+};
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickupDestroyDelegate);
+
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UE5_INTRODUCTION_API APickup : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
+
+public:
 	APickup();
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
+public:
 	virtual void Tick(float DeltaTime) override;
 
+
+protected:
+	UPROPERTY(EditAnywhere, Category = "Pickup")
+	FPickupStruct PickupStruct{};
+
+public:
+	inline EPickupType GetPickupType() { return PickupStruct.PickupType; }
+
+	void ClearTimer();
+	void StartPickupDestructionTimer();
+	void DestroyPickup();
+
+	FOnPickupDestroyDelegate OnPickupDestroy;
+
+protected:
+	FTimerHandle pickupDestructionTimerHandle{};
 };

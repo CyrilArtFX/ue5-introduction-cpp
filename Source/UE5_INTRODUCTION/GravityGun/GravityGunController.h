@@ -26,9 +26,18 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Inputs")
 	FName ThrowInputName{};
 
+	UPROPERTY(EditAnywhere, Category = "Inputs")
+	FName RangeInputName{};
+
+	UPROPERTY(EditAnywhere, Category = "Inputs", meta = (ClampMin = 1.0f, ClampMax = 100.0f))
+	float RangeChangeSensitivity{ 20.0f };
+
+
 protected:
 	void TakeObjectPressed();
+	void ComplexThrowForce();
 	void ThrowObjectPressed();
+	void RangeChange(float value);
 
 
 protected:
