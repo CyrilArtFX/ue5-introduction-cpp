@@ -61,4 +61,7 @@ public:
 
 protected:
 	FTimerHandle pickupDestructionTimerHandle{};
+
+public:
+	void StopVelocity();
 };

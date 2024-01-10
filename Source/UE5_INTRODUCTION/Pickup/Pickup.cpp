@@ -40,3 +40,13 @@ void APickup::DestroyPickup()
 	Destroy();
 }
 
+void APickup::StopVelocity()
+{
+	UStaticMeshComponent* mesh = GetComponentByClass<UStaticMeshComponent>();
+
+	if (!IsValid(mesh)) return;
+
+	mesh->SetAllPhysicsLinearVelocity(FVector::ZeroVector);
+	mesh->SetAllPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+}
+

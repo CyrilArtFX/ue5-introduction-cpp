@@ -8,6 +8,8 @@
 
 class ACustomCharacter;
 class UGravityGunController;
+class AGoal;
+class UScoreComponent;
 
 /**
  *
@@ -44,11 +46,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Inputs|Camera")
 	float MouseSensitivityRight{ 1.0f };
 
+	UPROPERTY(EditAnywhere, Category = "Inputs|Others")
+	FName CountScoreInputName{};
+
 
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
 	void Jump();
+	void CountScore();
 
 
 public:
@@ -61,4 +67,6 @@ public:
 protected:
 	ACustomCharacter* character{ nullptr };
 	UGravityGunController* gravityGunController{ nullptr };
+	TArray<AGoal*> goals;
+	UScoreComponent* scoreComp{ nullptr };
 };

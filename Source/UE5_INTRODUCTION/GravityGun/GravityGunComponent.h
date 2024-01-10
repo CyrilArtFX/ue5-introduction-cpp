@@ -8,6 +8,10 @@ class ACustomCharacter;
 class APlayerCameraManager;
 class APickup;
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPickupTakenNameDelegate, FString, PickupName);
+
+
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UE5_INTRODUCTION_API UGravityGunComponent : public UActorComponent
 {
@@ -87,6 +91,11 @@ protected:
 	FVector PickupAngularThrow{ 5000.0f };
 	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw|Angular", meta = (ClampMin = 0.0f, EditCondition = "bUseRandomAngularThrow == true", EditConditionHides));
 	float RandomAngularThrowRange{ 10000.0f };
+
+
+public:
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FPickupTakenNameDelegate OnPickupTaken;
 
 
 	//  debug

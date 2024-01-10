@@ -4,6 +4,9 @@
 #include "Controller/CustomController.h"
 #include "Character/CustomCharacter.h"
 #include "GravityGun/GravityGunController.h"
+#include "Goal/Goal.h"
+#include "Goal/ScoreComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Defines.h"
 
 
@@ -12,6 +15,14 @@ void ACustomController::BeginPlay()
 	Super::BeginPlay();
 
 	GetWorld()->OnWorldBeginPlay.AddUObject(this, &ACustomController::LateBeginPlay);
+
+	TArray<AActor*> actors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AGoal::StaticClass(), actors);
+
+	for (auto actor : actors)
+	{
+		goals.Add(CastChecked<AGoal>(actor));
+	}
 }
 
 void ACustomController::LateBeginPlay()
@@ -48,6 +59,23 @@ void ACustomController::Jump()
 	character->Jump();
 }
 
+void ACustomController::CountScore()
+{
+	if (IsValid(scoreComp))
+	{
+		scoreComp->DisplayScores();
+	}
+
+	int total_pickups = 0;
+
+	for (auto goal : goals)
+	{
+		total_pickups += goal->CountPickups();
+	}
+
+	kPRINT("Total number of pickups in all goals is " + FString::FromInt(total_pickups));
+}
+
 void ACustomController::AddPitchInput(float value)
 {
 	Super::AddPitchInput(value * MouseSensitivityUp);
@@ -69,6 +97,9 @@ void ACustomController::SetupInputComponent()
 
 	InputComponent->BindAxis(LookUpInputName, this, &ACustomController::AddPitchInput);
 	InputComponent->BindAxis(LookRightInputName, this, &ACustomController::AddYawInput);
+
+	FInputActionBinding& score_input_action_binding = InputComponent->BindAction(CountScoreInputName, EInputEvent::IE_Pressed, this, &ACustomController::CountScore);
+	score_input_action_binding.bConsumeInput = false;
 }
 
 void ACustomController::SetPawn(APawn* pawn)
@@ -76,4 +107,8 @@ void ACustomController::SetPawn(APawn* pawn)
 	Super::SetPawn(pawn);
 
 	character = Cast<ACustomCharacter>(pawn);
+
+	if (!IsValid(character)) return;
+
+	scoreComp = character->GetComponentByClass<UScoreComponent>();
 }

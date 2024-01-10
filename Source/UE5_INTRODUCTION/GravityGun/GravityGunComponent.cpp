@@ -107,6 +107,11 @@ void UGravityGunComponent::TakeObject()
 
 		currentPickup->OnPickupDestroy.AddUniqueDynamic(this, &UGravityGunComponent::OnHoldPickupDestroyed);
 	}
+
+	OnPickupTaken.Broadcast(currentPickup->GetActorNameOrLabel());
+
+	bAccumulatingForce = false;
+	complexForceTimeAccumulated = 0.0f;
 }
 
 void UGravityGunComponent::ReleaseObject()
@@ -126,10 +131,15 @@ void UGravityGunComponent::ReleaseObject()
 	}
 
 	currentPickup = nullptr;
+
+	bAccumulatingForce = false;
+	complexForceTimeAccumulated = 0.0f;
 }
 
 void UGravityGunComponent::ComplexThrowForceAccumulation()
 {
+	if (!IsValid(currentPickup)) return;
+
 	bAccumulatingForce = true;
 	complexForceTimeAccumulated = 0.0f;
 }
