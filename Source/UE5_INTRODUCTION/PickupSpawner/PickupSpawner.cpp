@@ -6,7 +6,7 @@
 
 UPickupSpawner::UPickupSpawner()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = false;
 }
 
 void UPickupSpawner::BeginPlay()
@@ -27,12 +27,6 @@ void UPickupSpawner::BeginPlay()
 		pickup->OnPickupDestroyWithType.AddUniqueDynamic(this, &UPickupSpawner::OnPickupDestroyed);
 	}
 }
-
-void UPickupSpawner::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
 
 void UPickupSpawner::SetupCharacter(ACustomCharacter* character_)
 {

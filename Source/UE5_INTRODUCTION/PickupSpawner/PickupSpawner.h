@@ -19,9 +19,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 
 public:
 	void SetupCharacter(ACustomCharacter* character_);
