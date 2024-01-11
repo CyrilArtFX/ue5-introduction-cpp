@@ -33,10 +33,12 @@ void UScoreComponent::OnGoalScored(EGoalTeam goalTeam)
 
 void UScoreComponent::DisplayScores()
 {
+	kPRINT("=========================================");
 	for (auto team_score : scores)
 	{
 		kPRINT(UEnum::GetValueAsString(team_score.Value.GoalTeam) + " has taken " + FString::FromInt(team_score.Value.score) + " goals.");
 	}
 
 	kPRINT("TEAM SCORES :");
+	kPRINT("=========================================");
 }

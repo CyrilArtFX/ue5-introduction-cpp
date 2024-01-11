@@ -34,8 +34,12 @@ public:
 	void ComplexThrowForceAccumulation();
 	void ThrowObject();
 	void UpdateRange(float change);
+	void DestroyPickupInHand();
+
+	void SetObjectInHand(APickup* pickup);
 
 	inline bool UseComplexThrowForce() { return bUseComplexThrowForce; }
+	bool HasObjectInHand();
 
 protected:
 	UFUNCTION()
@@ -77,7 +81,7 @@ protected:
 	float PickupThrowForce{ 2000.0f };
 	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (ClampMin = 0.0f, ClampMax = 15000.0f, EditCondition = "bUseComplexThrowForce == true", EditConditionHides));
 	FFloatInterval PickupComplexThrowForce{ 500.0f, 10000.0f };
-	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (ClampMin = 0.1f, ClampMax = 10.0f, EditCondition = "bUseComplexThrowForce == true", EditConditionHides, Tooltip = 
+	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (ClampMin = 0.1f, ClampMax = 10.0f, EditCondition = "bUseComplexThrowForce == true", EditConditionHides, Tooltip =
 		"The time the player needs to press the input to reach the max throw force"));
 	float PickupComplexThrowForceMaxTime{ 2.0f };
 

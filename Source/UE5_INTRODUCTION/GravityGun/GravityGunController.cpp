@@ -37,6 +37,8 @@ void UGravityGunController::SetupInputs(ACustomCharacter* character_, TObjectPtr
 	}
 
 	inputComponent->BindAxis(RangeInputName, this, &UGravityGunController::RangeChange);
+
+	inputComponent->BindAction(DestroyPickupInHandInputName, EInputEvent::IE_Pressed, this, &UGravityGunController::DestroyPickupInHand);
 }
 
 void UGravityGunController::TakeObjectPressed()
@@ -66,4 +68,11 @@ void UGravityGunController::RangeChange(float value)
 	if (value == 0.0f) return;
 
 	gravityGun->UpdateRange(value * RangeChangeSensitivity);
+}
+
+void UGravityGunController::DestroyPickupInHand()
+{
+	if (!IsValid(gravityGun)) return;
+
+	gravityGun->DestroyPickupInHand();
 }

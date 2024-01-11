@@ -30,6 +30,7 @@ struct FPickupStruct
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnPickupDestroyDelegate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPickupDestroyWithTypeDelegate, EPickupType, PickupType);
 
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UE5_INTRODUCTION_API APickup : public AActor
@@ -58,10 +59,19 @@ public:
 	void DestroyPickup();
 
 	FOnPickupDestroyDelegate OnPickupDestroy;
+	FOnPickupDestroyWithTypeDelegate OnPickupDestroyWithType;
 
 protected:
 	FTimerHandle pickupDestructionTimerHandle{};
 
 public:
 	void StopVelocity();
+
+protected:
+	UFUNCTION()
+	void OnActorDestroyed(AActor* destroyedActor);
+
+
+private:
+	bool bOnPickupDestroyAlreadyBroadcasted{ false };
 };

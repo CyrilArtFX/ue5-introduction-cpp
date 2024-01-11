@@ -4,6 +4,7 @@
 #include "Controller/CustomController.h"
 #include "Character/CustomCharacter.h"
 #include "GravityGun/GravityGunController.h"
+#include "PickupSpawner/PickupSpawnerController.h"
 #include "Goal/Goal.h"
 #include "Goal/ScoreComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,6 +33,14 @@ void ACustomController::LateBeginPlay()
 	if (IsValid(gravityGunController))
 	{
 		gravityGunController->SetupInputs(character, InputComponent);
+	}
+
+
+	pickupSpawnerController = GetComponentByClass<UPickupSpawnerController>();
+
+	if (IsValid(pickupSpawnerController))
+	{
+		pickupSpawnerController->SetupInputs(character, InputComponent);
 	}
 }
 

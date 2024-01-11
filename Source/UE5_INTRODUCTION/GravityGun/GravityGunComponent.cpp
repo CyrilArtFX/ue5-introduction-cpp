@@ -84,34 +84,11 @@ void UGravityGunComponent::TakeObject()
 
 	if (!result) return;
 
-	currentPickup = Cast<APickup>(hit.GetActor());
+	APickup* pickup = Cast<APickup>(hit.GetActor());
 
-	if (!IsValid(currentPickup)) return;
+	if (!IsValid(pickup)) return;
 
-	pickupMesh = currentPickup->GetComponentByClass<UStaticMeshComponent>();
-
-	if (!IsValid(pickupMesh)) return;
-
-	pickupBaseCollisionProfile = pickupMesh->GetCollisionProfileName();
-	pickupMesh->SetSimulatePhysics(false);
-	pickupMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
-
-	if (currentPickup->GetPickupType() == EPickupType::DestroyAfterThrow)
-	{
-		currentPickup->ClearTimer();
-	}
-
-	if (currentPickup->GetPickupType() == EPickupType::DestroyAfterTake)
-	{
-		currentPickup->StartPickupDestructionTimer();
-
-		currentPickup->OnPickupDestroy.AddUniqueDynamic(this, &UGravityGunComponent::OnHoldPickupDestroyed);
-	}
-
-	OnPickupTaken.Broadcast(currentPickup->GetActorNameOrLabel());
-
-	bAccumulatingForce = false;
-	complexForceTimeAccumulated = 0.0f;
+	SetObjectInHand(pickup);
 }
 
 void UGravityGunComponent::ReleaseObject()
@@ -209,6 +186,56 @@ void UGravityGunComponent::ThrowObject()
 void UGravityGunComponent::UpdateRange(float change)
 {
 	GravityGunRange = FMath::Clamp(GravityGunRange + change, CustomRange.Min, CustomRange.Max);
+}
+
+void UGravityGunComponent::DestroyPickupInHand()
+{
+	if (!IsValid(currentPickup)) return;
+
+	currentPickup->Destroy();
+
+	pickupBaseCollisionProfile = FName();
+	pickupMesh = nullptr;
+	currentPickup = nullptr;
+}
+
+void UGravityGunComponent::SetObjectInHand(APickup* pickup)
+{
+	if (!IsValid(pickup)) return;
+
+	if (IsValid(currentPickup)) return; //  can't set a pickup in hand if gravity gun already have a pickup in hand
+
+	currentPickup = pickup;
+
+	pickupMesh = currentPickup->GetComponentByClass<UStaticMeshComponent>();
+
+	if (!IsValid(pickupMesh)) return;
+
+	pickupBaseCollisionProfile = pickupMesh->GetCollisionProfileName();
+	pickupMesh->SetSimulatePhysics(false);
+	pickupMesh->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+
+	if (currentPickup->GetPickupType() == EPickupType::DestroyAfterThrow)
+	{
+		currentPickup->ClearTimer();
+	}
+
+	if (currentPickup->GetPickupType() == EPickupType::DestroyAfterTake)
+	{
+		currentPickup->StartPickupDestructionTimer();
+
+		currentPickup->OnPickupDestroy.AddUniqueDynamic(this, &UGravityGunComponent::OnHoldPickupDestroyed);
+	}
+
+	OnPickupTaken.Broadcast(currentPickup->GetActorNameOrLabel());
+
+	bAccumulatingForce = false;
+	complexForceTimeAccumulated = 0.0f;
+}
+
+bool UGravityGunComponent::HasObjectInHand() 
+{ 
+	return IsValid(currentPickup); 
 }
 
 void UGravityGunComponent::OnHoldPickupDestroyed()

@@ -8,6 +8,7 @@
 
 class ACustomCharacter;
 class UGravityGunController;
+class UPickupSpawnerController;
 class AGoal;
 class UScoreComponent;
 
@@ -67,6 +68,7 @@ public:
 protected:
 	ACustomCharacter* character{ nullptr };
 	UGravityGunController* gravityGunController{ nullptr };
+	UPickupSpawnerController* pickupSpawnerController{ nullptr };
 	TArray<AGoal*> goals;
 	UScoreComponent* scoreComp{ nullptr };
 };

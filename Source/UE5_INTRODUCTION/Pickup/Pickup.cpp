@@ -10,6 +10,7 @@ void APickup::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	OnDestroyed.AddUniqueDynamic(this, &APickup::OnActorDestroyed);
 }
 
 void APickup::Tick(float DeltaTime)
@@ -36,6 +37,7 @@ void APickup::DestroyPickup()
 	ClearTimer();
 
 	OnPickupDestroy.Broadcast();
+	bOnPickupDestroyAlreadyBroadcasted = true;
 
 	Destroy();
 }
@@ -48,5 +50,13 @@ void APickup::StopVelocity()
 
 	mesh->SetAllPhysicsLinearVelocity(FVector::ZeroVector);
 	mesh->SetAllPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
+}
+
+void APickup::OnActorDestroyed(AActor* destroyedActor)
+{
+	ClearTimer();
+
+	if (!bOnPickupDestroyAlreadyBroadcasted) OnPickupDestroy.Broadcast();
+	OnPickupDestroyWithType.Broadcast(GetPickupType());
 }
 
