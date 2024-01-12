@@ -97,7 +97,8 @@ void UPickupSpawner::SpawnPickup(EPickupType pickupType)
 
 	numberPickups[pickupType]++;
 
-	bSpawnable = false;
+	if (DelayBetweenTwoSpawn <= 0.0f) return;
+ 	bSpawnable = false;
 	ClearTimer();
 	FTimerManager& timer_manager = character->GetWorldTimerManager();
 	timer_manager.SetTimer(pickupSpawnDelayTimerHandle, this, &UPickupSpawner::SetSpawnableTrue, DelayBetweenTwoSpawn, false);

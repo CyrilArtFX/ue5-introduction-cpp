@@ -7,6 +7,7 @@
 #include "PickupSpawner/PickupSpawnerController.h"
 #include "Goal/Goal.h"
 #include "Goal/ScoreComponent.h"
+#include "PauseMenu/PauseMenuWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Defines.h"
 
@@ -68,6 +69,19 @@ void ACustomController::Jump()
 	character->Jump();
 }
 
+void ACustomController::Pause()
+{
+	if (!IsValid(pauseMenuWidget))
+	{
+		pauseMenuWidget = Cast<UPauseMenuWidget>(CreateWidget(this, PauseMenuClass, "PauseMenu"));
+		pauseMenuWidget->AddToViewport(1);
+	}
+	else
+	{
+		pauseMenuWidget->OpenMenu();
+	}
+}
+
 void ACustomController::CountScore()
 {
 	if (IsValid(scoreComp))
@@ -95,6 +109,16 @@ void ACustomController::AddYawInput(float value)
 	Super::AddYawInput(value * MouseSensitivityRight);
 }
 
+void ACustomController::SetMouseSensitivityX(float value)
+{
+	MouseSensitivityRight = value;
+}
+
+void ACustomController::SetMouseSensitivityY(float value)
+{
+	MouseSensitivityUp = value;
+}
+
 
 void ACustomController::SetupInputComponent()
 {
@@ -109,6 +133,8 @@ void ACustomController::SetupInputComponent()
 
 	FInputActionBinding& score_input_action_binding = InputComponent->BindAction(CountScoreInputName, EInputEvent::IE_Pressed, this, &ACustomController::CountScore);
 	score_input_action_binding.bConsumeInput = false;
+
+	InputComponent->BindAction(PauseMenuInputName, EInputEvent::IE_Pressed, this, &ACustomController::Pause);
 }
 
 void ACustomController::SetPawn(APawn* pawn)

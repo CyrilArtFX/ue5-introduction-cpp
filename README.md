@@ -3,6 +3,7 @@
 - **ZQSD** : Move
 - **Space Bar** : Jump
 - **Mouse Movement** : Camera
+- **P** : Pause Menu
 - **Left Click** : Take and release Pickups
 - **Right Click** : Throw Pickups (hold for throwing faster)
 - **Mouse Scroll** : Change Gravity Gun range

@@ -11,6 +11,7 @@ class UGravityGunController;
 class UPickupSpawnerController;
 class AGoal;
 class UScoreComponent;
+class UPauseMenuWidget;
 
 /**
  *
@@ -41,20 +42,27 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Inputs|Camera")
 	FName LookRightInputName{};
 
-	UPROPERTY(EditAnywhere, Category = "Inputs|Camera")
+	UPROPERTY(EditAnywhere, Category = "Inputs|Camera", meta = (ClampMin = 0.1f, ClampMax = 2.0f))
 	float MouseSensitivityUp{ 1.0f };
 
-	UPROPERTY(EditAnywhere, Category = "Inputs|Camera")
+	UPROPERTY(EditAnywhere, Category = "Inputs|Camera", meta = (ClampMin = 0.1f, ClampMax = 2.0f))
 	float MouseSensitivityRight{ 1.0f };
+
+	UPROPERTY(EditAnywhere, Category = "Inputs|Pause")
+	FName PauseMenuInputName{};
 
 	UPROPERTY(EditAnywhere, Category = "Inputs|Others")
 	FName CountScoreInputName{};
+
+	UPROPERTY(EditAnywhere, Category = "PauseMenu")
+	TSubclassOf<UPauseMenuWidget> PauseMenuClass{};
 
 
 protected:
 	void MoveForward(float value);
 	void MoveRight(float value);
 	void Jump();
+	void Pause();
 	void CountScore();
 
 
@@ -65,10 +73,18 @@ public:
 	void AddPitchInput(float value) override;
 	void AddYawInput(float value) override;
 
+public:
+	inline float GetMouseSensitivityX() { return MouseSensitivityRight; }
+	inline float GetMouseSensitivityY() { return MouseSensitivityUp; }
+
+	void SetMouseSensitivityX(float value);
+	void SetMouseSensitivityY(float value);
+
 protected:
 	ACustomCharacter* character{ nullptr };
 	UGravityGunController* gravityGunController{ nullptr };
 	UPickupSpawnerController* pickupSpawnerController{ nullptr };
 	TArray<AGoal*> goals;
 	UScoreComponent* scoreComp{ nullptr };
+	UPauseMenuWidget* pauseMenuWidget{ nullptr };
 };

@@ -7,6 +7,7 @@
 class ACustomCharacter;
 class APlayerCameraManager;
 class APickup;
+class UThrowForce;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FPickupTakenNameDelegate, FString, PickupName);
@@ -77,13 +78,17 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw")
 	bool bUseComplexThrowForce{ false };
+	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (EditCondition = "bUseComplexThrowForce == true", EditConditionHides));
+	bool bUseThrowForceCurve{ false };
 	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (ClampMin = 0.0f, ClampMax = 10000.0f, EditCondition = "bUseComplexThrowForce == false", EditConditionHides));
 	float PickupThrowForce{ 2000.0f };
-	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (ClampMin = 0.0f, ClampMax = 15000.0f, EditCondition = "bUseComplexThrowForce == true", EditConditionHides));
+	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (ClampMin = 0.0f, ClampMax = 15000.0f, EditCondition = "bUseComplexThrowForce == true && bUseThrowForceCurve == false", EditConditionHides));
 	FFloatInterval PickupComplexThrowForce{ 500.0f, 10000.0f };
-	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (ClampMin = 0.1f, ClampMax = 10.0f, EditCondition = "bUseComplexThrowForce == true", EditConditionHides, Tooltip =
+	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (ClampMin = 0.1f, ClampMax = 10.0f, EditCondition = "bUseComplexThrowForce == true && bUseThrowForceCurve == false", EditConditionHides, Tooltip =
 		"The time the player needs to press the input to reach the max throw force"));
 	float PickupComplexThrowForceMaxTime{ 2.0f };
+	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw", meta = (EditCondition = "bUseComplexThrowForce == true && bUseThrowForceCurve == true", EditConditionHides));
+	UCurveFloat* PickupThrowForceCurve{ nullptr };
 
 	bool bAccumulatingForce{ false };
 	float complexForceTimeAccumulated{ 0.0f };
@@ -97,9 +102,19 @@ protected:
 	float RandomAngularThrowRange{ 10000.0f };
 
 
+	UPROPERTY(EditAnywhere, Category = "GravityGun|Throw|Tests")
+	UThrowForce* ThrowForceDataAsset{ nullptr };
+
+
 public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FPickupTakenNameDelegate OnPickupTaken;
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsAccumulatingTime();
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetAccumulatingTimeFraction();
 
 
 	//  debug

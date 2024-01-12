@@ -1,6 +1,7 @@
 #include "GravityGun/GravityGunComponent.h"
 #include "Character/CustomCharacter.h"
 #include "Pickup/Pickup.h"
+#include "DataThrowForce/ThrowForce.h"
 #include "Kismet/GameplayStatics.h"
 #include "Defines.h"
 
@@ -20,6 +21,12 @@ void UGravityGunComponent::BeginPlay()
 	GravityGunRange = FMath::Clamp(GravityGunRange, CustomRange.Min, CustomRange.Max);
 
 	pickupOffsetXAtMaxCharge = PickupOffsetFromPlayer.X * 0.7f;
+
+	if (bUseComplexThrowForce && bUseThrowForceCurve && IsValid(PickupThrowForceCurve))
+	{
+		float curve_begin = 0.0f;
+		PickupThrowForceCurve->GetTimeRange(curve_begin, PickupComplexThrowForceMaxTime);
+	}
 }
 
 void UGravityGunComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -38,7 +45,7 @@ void UGravityGunComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 
 	FVector pickup_location = cameraManager->GetCameraLocation();
 	pickup_location += cameraManager->GetActorForwardVector() * (bAccumulatingForce
-			? FMath::Lerp(PickupOffsetFromPlayer.X, pickupOffsetXAtMaxCharge, complexForceTimeAccumulated / PickupComplexThrowForceMaxTime)
+			? FMath::Lerp(PickupOffsetFromPlayer.X, pickupOffsetXAtMaxCharge, GetAccumulatingTimeFraction())
 			: PickupOffsetFromPlayer.X);
 	pickup_location += cameraManager->GetActorRightVector() * PickupOffsetFromPlayer.Y;
 	pickup_location += cameraManager->GetActorUpVector() * PickupOffsetFromPlayer.Z;
@@ -153,12 +160,27 @@ void UGravityGunComponent::ThrowObject()
 
 		if (bUseComplexThrowForce)
 		{
-			float complex_throw_force = PickupComplexThrowForce.Interpolate(complexForceTimeAccumulated / PickupComplexThrowForceMaxTime);
+			float complex_throw_force;
+			if (bUseThrowForceCurve && IsValid(PickupThrowForceCurve))
+			{
+				complex_throw_force = PickupThrowForceCurve->GetFloatValue(complexForceTimeAccumulated);
+			}
+			else
+			{
+				complex_throw_force = PickupComplexThrowForce.Interpolate(complexForceTimeAccumulated / PickupComplexThrowForceMaxTime);
+			}
 			pickupMesh->AddImpulse(throw_direction * complex_throw_force, NAME_None, true);
 		}
 		else
 		{
 			pickupMesh->AddImpulse(throw_direction * PickupThrowForce, NAME_None, true);
+		}
+
+		if (false) //  just exemple of use of data asset
+		{
+			float min_force = ThrowForceDataAsset->MinThrowForce;
+			float max_force = ThrowForceDataAsset->MaxThrowForce;
+			float max_time = ThrowForceDataAsset->TimeToMaxForce;
 		}
 
 
@@ -247,5 +269,16 @@ void UGravityGunComponent::OnHoldPickupDestroyed()
 	pickupBaseCollisionProfile = FName();
 	pickupMesh = nullptr;
 	currentPickup = nullptr;
+}
+
+bool UGravityGunComponent::IsAccumulatingTime()
+{
+	return bAccumulatingForce;
+}
+
+float UGravityGunComponent::GetAccumulatingTimeFraction()
+{
+	//  compute ratio
+	return complexForceTimeAccumulated / PickupComplexThrowForceMaxTime;
 }
 
